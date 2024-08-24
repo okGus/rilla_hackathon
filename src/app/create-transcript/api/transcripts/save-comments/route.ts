@@ -12,6 +12,7 @@ type Comment = {
 
 interface CommentsRequest {
     comment: Comment;
+    userId: string;
 }
 
 export async function POST(request: Request) {
@@ -25,7 +26,7 @@ export async function POST(request: Request) {
     });
 
     const dynamoDbDocClient = DynamoDBDocumentClient.from(dynamoDbClient);
-    const { comment }: CommentsRequest = await request.json();
+    const { comment, userId }: CommentsRequest = await request.json();
 
     try {
         // Save comments
@@ -35,6 +36,7 @@ export async function POST(request: Request) {
                 PK: `TRANSCRIPT#${comment.transcriptId}`,
                 SK: `COMMENT#${uuidv4()}`,  // Unique ID for each comment
                 Comment: comment,
+                UserId: userId,
                 CreatedAt: new Date().toISOString(),
             },
         }))

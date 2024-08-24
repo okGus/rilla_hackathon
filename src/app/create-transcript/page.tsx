@@ -2,6 +2,7 @@
 import { Box, Button, TextField } from "@mui/material";
 import { useState, useRef, useEffect } from 'react';
 import { computePosition, autoPlacement } from '@floating-ui/react';
+import { useUser } from '@clerk/nextjs';
 
 export default function TranscriptManagementPage() {
   const [text, setText] = useState("");
@@ -18,6 +19,8 @@ export default function TranscriptManagementPage() {
 
   const [commentText, setCommentText] = useState("");
   const [comments, setComments] = useState<any[]>([]);
+
+  const { user } = useUser()
 
   type Comment = {
     transcriptId: string;
@@ -111,7 +114,7 @@ export default function TranscriptManagementPage() {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ transcript: text }),
+      body: JSON.stringify({ transcript: text, userId: user?.id }),
     });
     if (response.ok) {
       setText("");
@@ -140,7 +143,7 @@ export default function TranscriptManagementPage() {
         "Content-Type": "application/json",
       },
       
-      body: JSON.stringify({ comment: newComment }),
+      body: JSON.stringify({ comment: newComment, userId: user?.id }),
     });
   
     if (response.ok) {
@@ -179,7 +182,7 @@ export default function TranscriptManagementPage() {
         "Content-Type": "application/json",
       },
       
-      body: JSON.stringify({ comment: newComment }),
+      body: JSON.stringify({ comment: newComment, userId: user?.id }),
     });
   
     if (response.ok) {
@@ -284,6 +287,8 @@ export default function TranscriptManagementPage() {
         <h2>AI Summary</h2>
         <p>{summaryAI}</p>
       </Box>
+
+      <Button variant="contained" color="primary" onClick={() => setVisible(false)}>Save</Button>
     </Box>
   );
 }

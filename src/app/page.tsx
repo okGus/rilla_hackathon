@@ -75,6 +75,8 @@ export default function Home() {
   const handleSubmitComment = () => {
     console.log("Comment submitted");
     setComments([...comments, { content: commentText, position }]);
+    setCommentText("");
+    setVisible(false);
   }
 
   const handleEnter = (event: React.KeyboardEvent<HTMLDivElement>) => {

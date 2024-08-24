@@ -40,7 +40,7 @@ export default function TranscriptManagementPage() {
   useEffect(() => {
     const fetchComments = async () => {
       try {
-        const response = await fetch(`/api/transcripts/${transcriptID}`); // Replace with actual endpoint
+        const response = await fetch(`/create-transcript/api/transcripts/${transcriptID}`); // Replace with actual endpoint
         if (response.ok) {
           const data = await response.json();
           setComments(data.comments);
@@ -60,7 +60,7 @@ export default function TranscriptManagementPage() {
   useEffect (() => {
     const fetchSummary = async () => {
       try {
-        const response = await fetch('/api/transcripts/generate', {
+        const response = await fetch('/create-transcript/api/transcripts/generate', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -106,7 +106,7 @@ export default function TranscriptManagementPage() {
     if (text.trim() === "") {
       return;
     }
-    const response = await fetch("/api/transcripts/save-transcript", {
+    const response = await fetch("/create-transcript/api/transcripts/save-transcript", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -134,7 +134,7 @@ export default function TranscriptManagementPage() {
       position: { top: position.top, left: position.left }
     };
   
-    const response = await fetch("/api/transcripts/save-comments", {  // Replace with your actual API endpoint
+    const response = await fetch("/create-transcript/api/transcripts/save-comments", {  // Replace with your actual API endpoint
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -173,7 +173,7 @@ export default function TranscriptManagementPage() {
       position: { top: position.top, left: position.left }
     };
   
-    const response = await fetch("/api/transcripts/save-comments", {  // Replace with your actual API endpoint
+    const response = await fetch("/create-transcript/api/transcripts/save-comments", {  // Replace with your actual API endpoint
       method: "POST",
       headers: {
         "Content-Type": "application/json",

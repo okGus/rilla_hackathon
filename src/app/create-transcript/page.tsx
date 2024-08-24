@@ -3,6 +3,8 @@ import { Box, Button, TextField, Modal, Typography } from "@mui/material";
 import { useState, useRef, useEffect } from 'react';
 import { computePosition, autoPlacement } from '@floating-ui/react';
 import { useUser } from '@clerk/nextjs';
+import Draggable from 'react-draggable';
+import { useRouter } from "next/navigation";
 
 export default function TranscriptManagementPage() {
   const [text, setText] = useState("");
@@ -24,6 +26,8 @@ export default function TranscriptManagementPage() {
   const [textTitle, setTextTitle] = useState("");
 
   const { user } = useUser()
+
+  const router = useRouter();
 
   type Comment = {
     transcriptId: string;
@@ -193,7 +197,38 @@ export default function TranscriptManagementPage() {
   }
 
   const handleSaveTranscript = async () => {
-    setHandleSave(true);
+    setHandleSave(true)
+  }
+
+  const confirmSaveTranscript = async () => {
+    setHandleSave(false);
+    try {
+      const response = await fetch('/create-transcript/api/transcripts/save-title-transcript', { // Adjust path if necessary
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          transcriptId: transcriptID,
+          userId: user?.id,
+          newTitle: textTitle,
+        }),
+      });
+  
+      if (response.ok) {
+        const data = await response.json();
+        console.log('Transcript updated:', data);
+        // Handle success (e.g., show a notification, update UI)
+      } else {
+        console.error('Failed to update transcript');
+      }
+    } catch (error) {
+      console.error('Error:', error);
+    } finally {
+      setHandleSave(false);
+    }
+
+    router.push('/'); // Redirect to the homepage
   }
 
   return (
@@ -268,8 +303,9 @@ export default function TranscriptManagementPage() {
       )}
 
       {comments.map((comment, index) => (
+        <Draggable key={index}>
         <div
-          key={index}
+          // key={index}
           style={{
             position: 'absolute',
             top: comment.Comment.position.top,
@@ -297,6 +333,7 @@ export default function TranscriptManagementPage() {
           </button>
           <p>{comment.Comment.content}</p>
         </div>
+        </Draggable>
       ))}
 
       <Box>
@@ -326,7 +363,7 @@ export default function TranscriptManagementPage() {
                 </Typography>
                 <TextField value={textTitle} onChange={(e) => setTextTitle(e.target.value)} label="Enter title" fullWidth multiline rows={4} variant="outlined">
                 </TextField>
-                <Button variant="contained" color="primary" onClick={() => setHandleSave(false)}>Save</Button>
+                <Button variant="contained" color="primary" onClick={confirmSaveTranscript}>Save</Button>
             </Box>
         </Modal>
       )}

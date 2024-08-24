@@ -34,6 +34,9 @@ const HomePage: React.FC = () => {
         <Button onClick={() => router.push('/create-transcript')} variant="contained" color="primary" style={{ marginTop: '20px' }}>
           Create Transcript
         </Button>
+        <Button onClick={() => router.push('/transcripts')} variant="contained" color="primary" style={{ marginTop: '20px' }}>
+          See Transcripts
+        </Button>
       </div>
     </Box>
   );

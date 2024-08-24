@@ -28,8 +28,6 @@ export async function GET(request: Request, { params }: { params: { id: string }
         const transcriptItem = result.Items?.find(item => item.SK === 'METADATA');
         // Get comment from Sort Key
         const commentsItems = (result.Items || []).filter(item => item.SK.startsWith('COMMENT#'));
-        console.log(result)
-        console.log(commentsItems);
 
         if (!transcriptItem) {
             return NextResponse.json({ error: 'Transcript not found' }, { status: 404 });

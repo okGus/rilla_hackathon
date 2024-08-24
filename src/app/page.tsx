@@ -55,12 +55,12 @@ export default function Home() {
     if (text.trim() === "") {
       return;
     }
-    const response = await fetch("/api/transcript", {
+    const response = await fetch("/api/transcripts/save-transcript", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ text }),
+      body: JSON.stringify({ transcript: text }),
     });
     if (response.ok) {
       setText("");

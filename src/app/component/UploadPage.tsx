@@ -19,13 +19,17 @@ export default function Upload() {
   const [selected, setSelected] = useState('');
 
   const handleFile = (e) => {
-    if (e.target.files[0]) {
-      const file = e.target.files[0];
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        setFileContent(e.target.result);
-      };
-      reader.readAsText(file);
+    try{
+      if (e.target.files[0]) {
+        const file = e.target.files[0];
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          setFileContent(e.target.result);
+        };
+        reader.readAsText(file);
+      }
+    }catch(e){
+      console.log(e);
     }
   };
 

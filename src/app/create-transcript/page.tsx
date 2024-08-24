@@ -166,6 +166,32 @@ export default function TranscriptManagementPage() {
     }
   };
 
+  const handleSubmitCommentFile = async () => {
+    const newComment: Comment = {
+      transcriptId: transcriptID,
+      content: 'picture',
+      position: { top: position.top, left: position.left }
+    };
+  
+    const response = await fetch("/api/transcripts/save-comments", {  // Replace with your actual API endpoint
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      
+      body: JSON.stringify({ comment: newComment }),
+    });
+  
+    if (response.ok) {
+      const data = await response.json();
+      setCommentText("");
+      setVisible(false);
+      setCommentCount(prevCount => prevCount + 1);
+    } else {
+      console.log("Failed to submit comment");
+    }
+  }
+
   return (
     <Box
       flexDirection={"column"}
@@ -233,6 +259,7 @@ export default function TranscriptManagementPage() {
             value={commentText}
             onChange={(e) => setCommentText(e.target.value)}
           />
+          <Button variant="contained" color="primary" onClick={handleSubmitCommentFile}>Submit Image</Button>
         </div>
       )}
 

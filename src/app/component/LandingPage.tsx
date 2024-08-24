@@ -11,10 +11,8 @@ import {
     CardContent,
     styled,
     keyframes,
-    AppBar,
-    Toolbar,
 } from '@mui/material';
-import { Comment, Edit, Delete, AttachFile, PlayArrow, CheckCircleOutline } from '@mui/icons-material';
+import { Comment, Edit, Delete, AttachFile, CheckCircleOutline } from '@mui/icons-material';
 import Link from 'next/link';
 
 const fadeIn = keyframes`
@@ -98,19 +96,6 @@ export default function LandingPage(){
                                     }
                                 }}
                             >
-                                <Box
-                                    component="img"
-                                    src="/dashboard-mockup.png"
-                                    alt="Dashboard Mockup"
-                                    sx={{
-                                    width: '100%',
-                                    height: 'auto',
-                                    position: 'relative',
-                                    zIndex: 1,
-                                    borderRadius: '12px',
-                                    boxShadow: '0 20px 40px rgba(0,0,0,0.2)',
-                                    }}
-                                />
                             </Box>
                         </Grid>
                     </Grid>
@@ -157,92 +142,9 @@ export default function LandingPage(){
                             <Typography variant="body1" sx={{ mb: 4 }}>
                                 Watch how our intuitive interface revolutionizes transcript management. From quick annotations to in-depth analysis, weve got you covered.
                             </Typography>
-                            <Button
-                                variant="outlined"
-                                startIcon={<PlayArrow />}
-                                size="large"
-                                sx={{ 
-                                    borderColor: '#1a237e',
-                                    color: '#1a237e',
-                                    '&:hover': { bgcolor: 'rgba(26, 35, 126, 0.04)' },
-                                }}
-                            >
-                                Watch Demo
-                            </Button>
                         </Grid>
-                        <Grid item xs={12} md={6}>
-                            <Box
-                                sx={{
-                                    position: 'relative',
-                                    paddingTop: '56.25%', // 16:9 aspect ratio
-                                    bgcolor: '#f0f0f0',
-                                    borderRadius: '12px',
-                                    overflow: 'hidden',
-                                    boxShadow: '0 10px 30px rgba(0,0,0,0.1)',
-                                }}
-                            >
-                                <Box
-                                    component="img"
-                                    src="/video-placeholder.jpg"
-                                    alt="Product demo video"
-                                    sx={{
-                                    position: 'absolute',
-                                    top: 0,
-                                    left: 0,
-                                    width: '100%',
-                                    height: '100%',
-                                    objectFit: 'cover',
-                                    }}
-                                />
-                                <Box
-                                    sx={{
-                                    position: 'absolute',
-                                    top: '50%',
-                                    left: '50%',
-                                    transform: 'translate(-50%, -50%)',
-                                    bgcolor: 'rgba(255,255,255,0.8)',
-                                    borderRadius: '50%',
-                                    p: 2,
-                                    cursor: 'pointer',
-                                    }}
-                                >
-                                    <PlayArrow sx={{ fontSize: 60, color: '#1a237e' }} />
-                                </Box>
-                            </Box>
-                        </Grid>
+                        
                     </Grid>
-                </Container>
-            </Box>
-
-            {/* Testimonial Section */}
-            <Box sx={{ bgcolor: '#f5f5f7', py: 10 }}>
-                <Container maxWidth="md">
-                    <Typography variant="h3" align="center" sx={{ mb: 6, fontWeight: 700 }}>
-                        What Our Customers Say
-                    </Typography>
-                    <Card sx={{ bgcolor: 'white', borderRadius: '16px', boxShadow: '0 10px 30px rgba(0,0,0,0.1)' }}>
-                        <CardContent sx={{ p: 4 }}>
-                            <Typography variant="body1" sx={{ mb: 3, fontStyle: 'italic' }}>
-                                {/* Testimony here */}
-                            </Typography>
-                            <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                                <Box
-                                    component="img"
-                                    src="/avatar-placeholder.jpg"
-                                    alt="Customer avatar"
-                                    sx={{ width: 60, height: 60, borderRadius: '50%', mr: 2 }}
-                                />
-                                <Box>
-                                    <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
-                                        {/* Sarah Johnson */}
-                                    </Typography>
-                                    <Typography variant="body2" color="text.secondary">
-                                        {/* Sales Director, TechCorp Inc. */}
-                                    </Typography>
-                                </Box>
-                            </Box>
-                        </CardContent>
-                    </Card>
                 </Container>
             </Box>
 

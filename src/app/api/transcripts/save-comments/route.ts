@@ -1,5 +1,7 @@
 import { NextResponse } from 'next/server';
-import AWS from 'aws-sdk';
+// import AWS from 'aws-sdk';
+import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
+import { DynamoDBDocumentClient, PutCommand } from '@aws-sdk/lib-dynamodb';
 import { v4 as uuidv4 } from 'uuid';
 
 interface Comment {
@@ -14,19 +16,23 @@ interface CommentsRequest {
     comments: Comment[];
 }
 
-const dynamoDb = new AWS.DynamoDB.DocumentClient({
-    region: process.env.AWS_REGION,
-    accessKeyId: process.env.AWS_ACCESS_KEY_ID,
-    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
-});
-
 export async function POST(request: Request) {
+    // Initialize the DynamoDB client and document client
+    const dynamoDbClient = new DynamoDBClient({
+        region: process.env.AWS_REGION,
+        credentials: {
+            accessKeyId: process.env.AWS_ACCESS_KEY_ID!,
+            secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY!,
+        }
+    });
+
+    const dynamoDbDocClient = DynamoDBDocumentClient.from(dynamoDbClient);
     const { transcriptId, comments }: CommentsRequest = await request.json();
 
     try {
         // Save comments
         const commentPromises = comments.map((comment) =>
-            dynamoDb.put({
+            dynamoDbDocClient.send(new PutCommand({
             TableName: 'Transcripts',
             Item: {
                 PK: `TRANSCRIPT#${transcriptId}`,
@@ -37,7 +43,7 @@ export async function POST(request: Request) {
                 Comment: comment.comment,
                 CreatedAt: new Date().toISOString(),
             },
-            }).promise()
+            }))
         );
 
         await Promise.all(commentPromises);

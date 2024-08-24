@@ -4,16 +4,14 @@ import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
 import { DynamoDBDocumentClient, PutCommand } from '@aws-sdk/lib-dynamodb';
 import { v4 as uuidv4 } from 'uuid';
 
-interface Comment {
-    text: string;
-    startOffset: number;
-    endOffset: number;
-    comment: string;
-}
+type Comment = {
+    transcriptId: string;
+    content: string;
+    position: { top: number; left: number };
+};
 
 interface CommentsRequest {
-    transcriptId: string;
-    comments: Comment[];
+    comment: Comment;
 }
 
 export async function POST(request: Request) {
@@ -27,26 +25,21 @@ export async function POST(request: Request) {
     });
 
     const dynamoDbDocClient = DynamoDBDocumentClient.from(dynamoDbClient);
-    const { transcriptId, comments }: CommentsRequest = await request.json();
+    const { comment }: CommentsRequest = await request.json();
 
     try {
         // Save comments
-        const commentPromises = comments.map((comment) =>
-            dynamoDbDocClient.send(new PutCommand({
+        await dynamoDbDocClient.send(new PutCommand({
             TableName: 'Transcripts',
             Item: {
-                PK: `TRANSCRIPT#${transcriptId}`,
+                PK: `TRANSCRIPT#${comment.transcriptId}`,
                 SK: `COMMENT#${uuidv4()}`,  // Unique ID for each comment
-                Text: comment.text,
-                StartOffset: comment.startOffset,
-                EndOffset: comment.endOffset,
-                Comment: comment.comment,
+                Comment: comment,
                 CreatedAt: new Date().toISOString(),
             },
-            }))
-        );
+        }))
 
-        await Promise.all(commentPromises);
+        // await Promise.all(commentPromises);
 
         return NextResponse.json({ message: 'Comments saved successfully' }, { status: 201 });
     } catch (error) {

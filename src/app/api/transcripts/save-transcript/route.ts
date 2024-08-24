@@ -33,7 +33,7 @@ export async function POST(request: Request) {
             }
         }));
 
-        return NextResponse.json({ message: 'Transcript saved successfully' }, { status: 201 });
+        return NextResponse.json({ message: 'Transcript saved successfully', transcript: transcript, id: transcriptId }, { status: 201 });
     } catch (error) {
         console.error(error);
         return NextResponse.json({ error: 'Failed to save transcript' }, { status: 500 });

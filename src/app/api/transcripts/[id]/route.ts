@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 // import AWS from 'aws-sdk';
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
 import { QueryCommand } from '@aws-sdk/lib-dynamodb';
+import { comment } from "postcss";
 
 export async function GET(request: Request, { params }: { params: { id: string } }) {
     const { id } = params;
@@ -27,6 +28,8 @@ export async function GET(request: Request, { params }: { params: { id: string }
         const transcriptItem = result.Items?.find(item => item.SK === 'METADATA');
         // Get comment from Sort Key
         const commentsItems = (result.Items || []).filter(item => item.SK.startsWith('COMMENT#'));
+        console.log(result)
+        console.log(commentsItems);
 
         if (!transcriptItem) {
             return NextResponse.json({ error: 'Transcript not found' }, { status: 404 });

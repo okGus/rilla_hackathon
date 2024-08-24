@@ -11,12 +11,14 @@ export default function Home() {
   const referenceRef = useRef<HTMLDivElement>(null);
   const floatingRef = useRef<HTMLDivElement>(null);
   const inputTextField = useRef<HTMLTextAreaElement>(null);
-  const [commentPublished, setCommentPublished] = useState(false);
+  const [commentCount, setCommentCount] = useState(0);
+  const [transcriptID, setTranscriptID] = useState(""); // Replace with actual transcript ID
 
   const [commentText, setCommentText] = useState("");
-  const [comments, setComments] = useState<Comment[]>([]);
+  const [comments, setComments] = useState<any[]>([]);
 
   type Comment = {
+    transcriptId: string;
     content: string;
     position: { top: number; left: number };
   };
@@ -32,6 +34,26 @@ export default function Home() {
       setVisible(true);
     }
   };
+
+  useEffect(() => {
+    const fetchComments = async () => {
+      try {
+        const response = await fetch(`/api/transcripts/${transcriptID}`); // Replace with actual endpoint
+        if (response.ok) {
+          const data = await response.json();
+          setComments(data.comments);
+        } else {
+          console.error("Failed to fetch comments");
+        }
+      } catch (error) {
+        console.error("Error fetching comments:", error);
+      }
+    };
+
+    // Fetch comments if a comment has been published
+    if (commentCount > 0)
+      fetchComments();
+  }, [commentCount, transcriptID]);
 
   useEffect(() => {
     document.addEventListener('mouseup', handleTextSelection);
@@ -65,19 +87,42 @@ export default function Home() {
     if (response.ok) {
       setText("");
       const data = await response.json();
-      setResponseText(data);
-      setCommentPublished(true); // Mark the comment as published
+      setResponseText(data.transcript);
+      setTranscriptID(data.id);
     } else {
       alert("Failed to submit transcript");
     }
   };
 
-  const handleSubmitComment = () => {
-    console.log("Comment submitted");
-    setComments([...comments, { content: commentText, position }]);
-    setCommentText("");
-    setVisible(false);
-  }
+  const handleSubmitComment = async () => {
+    if (commentText.trim() === "") {
+      return;
+    }
+
+    const newComment: Comment = {
+      transcriptId: transcriptID,
+      content: commentText,
+      position: { top: position.top, left: position.left }
+    };
+  
+    const response = await fetch("/api/transcripts/save-comments", {  // Replace with your actual API endpoint
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      
+      body: JSON.stringify({ comment: newComment }),
+    });
+  
+    if (response.ok) {
+      const data = await response.json();
+      setCommentText("");
+      setVisible(false);
+      setCommentCount(prevCount => prevCount + 1);
+    } else {
+      console.log("Failed to submit comment");
+    }
+  };
 
   const handleEnter = (event: React.KeyboardEvent<HTMLDivElement>) => {
     if (event.key === 'Enter') {
@@ -167,15 +212,15 @@ export default function Home() {
           key={index}
           style={{
             position: 'absolute',
-            top: comment.position.top,
-            left: comment.position.left,
+            top: comment.Comment.position.top,
+            left: comment.Comment.position.left,
             background: 'lightgray',
             padding: '10px',
             borderRadius: '5px',
             boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
           }}
         >
-          <p>{comment.content}</p>
+          <p>{comment.Comment.content}</p>
         </div>
       ))}
     </Box>

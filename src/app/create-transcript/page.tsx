@@ -159,6 +159,23 @@ export default function TranscriptManagementPage() {
     }
   };
 
+  const handleDeleteComment = async (index: number) => {
+    const comment = comments[index];
+    const response = await fetch("/create-transcript/api/transcripts/delete-comment", {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ commentPK: comment.PK, commentSK: comment.SK, userId: user?.id }),
+    });
+    if (response.ok) {
+      setComments((prevComments) => prevComments.filter((_, i) => i !== index));
+      setCommentCount(prevCount => prevCount + 1);
+    } else {
+      console.error("Failed to delete comment");
+    }
+  }
+
   const handleEnter = (event: React.KeyboardEvent<HTMLDivElement>) => {
     if (event.key === 'Enter') {
       event.preventDefault(); // Prevent default behavior if needed
@@ -263,6 +280,21 @@ export default function TranscriptManagementPage() {
             boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
           }}
         >
+          <button
+            onClick={() => handleDeleteComment(index)}
+            style={{
+              position: 'absolute',
+              top: '5px',
+              right: '5px',
+              background: 'transparent',
+              border: 'none',
+              cursor: 'pointer',
+              fontWeight: 'bold',
+              color: 'red',
+            }}
+          >
+            X
+          </button>
           <p>{comment.Comment.content}</p>
         </div>
       ))}

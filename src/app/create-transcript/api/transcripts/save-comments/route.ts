@@ -42,6 +42,7 @@ export async function POST(request: Request) {
         }))
 
         // await Promise.all(commentPromises);
+        console.log('Comment saved successfully');
 
         return NextResponse.json({ message: 'Comments saved successfully' }, { status: 201 });
     } catch (error) {

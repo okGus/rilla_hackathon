@@ -1,5 +1,5 @@
 "use client";
-import { Box, Button, TextField } from "@mui/material";
+import { Box, Button, TextField, Modal, Typography } from "@mui/material";
 import { useState, useRef, useEffect } from 'react';
 import { computePosition, autoPlacement } from '@floating-ui/react';
 import { useUser } from '@clerk/nextjs';
@@ -19,6 +19,9 @@ export default function TranscriptManagementPage() {
 
   const [commentText, setCommentText] = useState("");
   const [comments, setComments] = useState<any[]>([]);
+
+  const [handleSave, setHandleSave] = useState(false);
+  const [textTitle, setTextTitle] = useState("");
 
   const { user } = useUser()
 
@@ -170,29 +173,10 @@ export default function TranscriptManagementPage() {
   };
 
   const handleSubmitCommentFile = async () => {
-    const newComment: Comment = {
-      transcriptId: transcriptID,
-      content: 'picture',
-      position: { top: position.top, left: position.left }
-    };
-  
-    const response = await fetch("/create-transcript/api/transcripts/save-comments", {  // Replace with your actual API endpoint
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      
-      body: JSON.stringify({ comment: newComment, userId: user?.id }),
-    });
-  
-    if (response.ok) {
-      const data = await response.json();
-      setCommentText("");
-      setVisible(false);
-      setCommentCount(prevCount => prevCount + 1);
-    } else {
-      console.log("Failed to submit comment");
-    }
+  }
+
+  const handleSaveTranscript = async () => {
+    setHandleSave(true);
   }
 
   return (
@@ -288,7 +272,32 @@ export default function TranscriptManagementPage() {
         <p>{summaryAI}</p>
       </Box>
 
-      <Button variant="contained" color="primary" onClick={() => setVisible(false)}>Save</Button>
+      <Button variant="contained" color="primary" onClick={handleSaveTranscript}>Save</Button>
+
+      {handleSave && (
+        <Modal open={handleSave} onClose={() => setHandleSave(false)}>
+          <Box
+            sx={{
+              position: 'absolute',
+              top: '50%',
+              left: '50%',
+              transform: 'translate(-50%, -50%)',
+              width: 400,
+              bgcolor: 'background.paper',
+              border: '2px solid #000',
+              boxShadow: 24,
+              p: 4,
+            }}
+          >
+                <Typography id="modal-modal-title" variant="h6" component="h2">
+                  Save Transcript
+                </Typography>
+                <TextField value={textTitle} onChange={(e) => setTextTitle(e.target.value)} label="Enter title" fullWidth multiline rows={4} variant="outlined">
+                </TextField>
+                <Button variant="contained" color="primary" onClick={() => setHandleSave(false)}>Save</Button>
+            </Box>
+        </Modal>
+      )}
     </Box>
   );
 }

@@ -14,6 +14,8 @@ export default function TranscriptManagementPage() {
   const [commentCount, setCommentCount] = useState(0);
   const [transcriptID, setTranscriptID] = useState(""); // Replace with actual transcript ID
 
+  const [summaryAI, setSummaryAI] = useState("");
+
   const [commentText, setCommentText] = useState("");
   const [comments, setComments] = useState<any[]>([]);
 
@@ -54,6 +56,33 @@ export default function TranscriptManagementPage() {
     if (commentCount > 0)
       fetchComments();
   }, [commentCount, transcriptID]);
+
+  useEffect (() => {
+    const fetchSummary = async () => {
+      try {
+        const response = await fetch('/api/transcripts/generate', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ transcript: responseText, comments: comments }),
+        });
+        if (response.ok) {
+          const data = await response.json();
+          setSummaryAI(data.response.choices[0].message.content);
+        } else {
+          console.error('Failed to fetch summary');
+        }
+      } catch (error) {
+        console.error('Error fetching summary:', error);
+      }
+    };
+
+    // Fetch summary if comments have been added
+    if (comments.length > 0) {
+      fetchSummary();
+    }
+  }, [comments]);
 
   useEffect(() => {
     document.addEventListener('mouseup', handleTextSelection);
@@ -223,6 +252,11 @@ export default function TranscriptManagementPage() {
           <p>{comment.Comment.content}</p>
         </div>
       ))}
+
+      <Box>
+        <h2>AI Summary</h2>
+        <p>{summaryAI}</p>
+      </Box>
     </Box>
   );
 }

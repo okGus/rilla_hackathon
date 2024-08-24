@@ -1,7 +1,11 @@
 import { NextResponse } from "next/server";
 import AWS from 'aws-sdk';
 
-const dynamoDB = new AWS.DynamoDB.DocumentClient();
+const dynamoDB = new AWS.DynamoDB.DocumentClient({
+    region: process.env.AWS_REGION,
+    accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+});
 
 export async function GET(request: Request, { params }: { params: { id: string } }) {
     const { id } = params;

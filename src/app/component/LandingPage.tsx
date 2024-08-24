@@ -109,10 +109,10 @@ export default function LandingPage(){
                 </Typography>
                 <Grid container spacing={4}>
                     {[
-                        { icon: <Comment />, title: "Smart Annotations", text: "AI-powered comment suggestions" },
-                        { icon: <Edit />, title: "Real-time Editing", text: "Collaborate with your team in real-time" },
-                        { icon: <Delete />, title: "Version Control", text: "Track changes and revert when needed" },
-                        { icon: <AttachFile />, title: "Rich Attachments", text: "Add context with multi-media files" },
+                        { icon: <Comment />, title: "Smart Annotations", text: "AI-powered comment summarization" },
+                        { icon: <Edit />, title: "Real-time Editing", text: "Add, delete, edit comments on transcripts" },
+                        // { icon: <Delete />, title: "Version Control", text: "Track changes and revert when needed" },
+                        { icon: <AttachFile />, title: "Rich Attachments", text: "Upload your sales transcripts" },
                     ].map((feature, index) => (
                     <Grid item xs={12} sm={6} md={3} key={index}>
                         <FeatureCard elevation={0} sx={{ height: '100%', bgcolor: 'transparent' }}>

@@ -1,5 +1,5 @@
-'use client'
-import React, { useEffect, useState } from 'react';
+'use client';
+import React, { useEffect, useState, useRef, useLayoutEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Box, Typography, CircularProgress, Divider, Button } from '@mui/material';
 import Draggable from 'react-draggable';
@@ -29,8 +29,9 @@ export default function TranscriptPage({ params }: { params: { pk: string } }) {
   const [loading, setLoading] = useState(true);
   const [dataLoad, setDataLoad] = useState(false);
   const [summaryAI, setSummaryAI] = useState<string | null>(null);
-
   const [resetComments, setResetComments] = useState(false);
+  const [containerDimensions, setContainerDimensions] = useState({ width: 0, height: 0 });
+  const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const fetchTranscriptAndComments = async () => {
@@ -76,6 +77,41 @@ export default function TranscriptPage({ params }: { params: { pk: string } }) {
     fetchTranscriptAndComments();
   }, [pk]);
 
+  useLayoutEffect(() => {
+    if (containerRef.current) {
+      const { offsetWidth, offsetHeight } = containerRef.current;
+      setContainerDimensions({ width: offsetWidth, height: offsetHeight });
+    }
+  }, [transcript, comments]);
+
+  useEffect(() => {
+    const fetchSummary = async () => {
+      try {
+        if (transcript && containerDimensions.height > 0) {
+          const response = await fetch(`/transcripts/transcript/${strip_pk}/api/generate`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ transcript: transcript.Content, comments: comments }),
+          });
+          if (response.ok) {
+            const data = await response.json();
+            setSummaryAI(data.response.choices[0].message.content);
+          } else {
+            console.error('Failed to fetch summary');
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching summary:', error);
+      }
+    };
+
+    if (dataLoad) {
+      fetchSummary();
+    }
+  }, [dataLoad, transcript, comments, containerDimensions.height]);
+
   useEffect(() => {
     if (resetComments) {
       // Reset comments to original positions
@@ -86,32 +122,6 @@ export default function TranscriptPage({ params }: { params: { pk: string } }) {
       })));
     }
   }, [resetComments]);
-
-  useEffect(() => {
-    const fetchSummary = async () => {
-      try {
-        const response = await fetch(`/transcripts/transcript/${strip_pk}/api/generate`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ transcript: transcript!.Content, comments: comments }),
-        });
-        if (response.ok) {
-          const data = await response.json();
-          setSummaryAI(data.response.choices[0].message.content);
-        } else {
-          console.error('Failed to fetch summary');
-        }
-      } catch (error) {
-        console.error('Error fetching summary:', error);
-      }
-    };
-
-    if (comments.length > 0) {
-      fetchSummary();
-    }
-  }, [dataLoad]);
 
   const handleResetComments = () => {
     setResetComments(true);
@@ -128,17 +138,23 @@ export default function TranscriptPage({ params }: { params: { pk: string } }) {
           <Typography variant="h4" gutterBottom sx={{ marginBottom: 2 }}>
             {transcript.Title}
           </Typography>
-          <Box sx={{ position: 'relative' }}>
+          <Box sx={{ position: 'relative' }} ref={containerRef}>
             <Typography variant="body1" paragraph sx={{ marginBottom: 4 }}>
               {transcript.Content}
             </Typography>
             {comments.map((comment, index) => (
-              <Draggable key={index} position={{ x: comment.position.left, y: comment.position.top - 670 }}>
+              <Draggable
+                key={index}
+                position={{
+                  x: comment.position.left,
+                  y: comment.position.top - containerDimensions.height - 260,
+                }}
+              >
                 <Box
                   sx={{
                     position: 'absolute',
                     backgroundColor: 'rgba(255, 255, 255, 1)',
-                    padding: 1,
+                    padding: 3,
                     borderRadius: 1,
                     boxShadow: 2,
                   }}

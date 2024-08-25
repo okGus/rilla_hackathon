@@ -285,12 +285,14 @@ export default function TranscriptManagementPage() {
 
   return (
     <Box
+      display={'flex'}
       flexDirection={"column"}
       sx={{
         backgroundColor: "#121212",
         color: "white",
         minHeight: "100vh",
         py: 4,
+        px: 2,
       }}
     >
       <TextField
@@ -322,25 +324,30 @@ export default function TranscriptManagementPage() {
           },
         }}
       />
-      <Button variant="contained" color="primary" onClick={handleSubmit}>Submit transcript</Button>
+      <Button variant="contained" color="primary" onClick={handleSubmit} sx={{ mb: 2 }}>Submit transcript</Button>
       <Box sx={{ mt: 2 }} ref={referenceRef}>
-        {responseText && <Box>{responseText}</Box>}
+        {responseText && (
+          <Box sx={{ mb: 2 }}>
+            <Typography variant="body1">{responseText}</Typography>
+          </Box>
+        )}
         <Button variant="contained" color="primary" onClick={() => setResponseText("")}>Clear</Button>
       </Box>
 
       {visible && (
-        <div
+        <Box
           ref={floatingRef}
-          style={{
+          sx={{
             position: 'absolute',
             top: position.top + 5,
             left: position.left,
             background: 'lightgray',
-            padding: '10px',
-            borderRadius: '5px',
-            boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+            padding: 2,
+            borderRadius: 1,
+            boxShadow: 3,
             display: 'flex',
-            flexDirection: 'column'
+            flexDirection: 'column',
+            gap: 1,
           }}
         >
           <TextField
@@ -359,54 +366,63 @@ export default function TranscriptManagementPage() {
             style={{ margin: '10px 0' }}
           />
           <Button variant="contained" color="primary" onClick={handleSubmitCommentFile}>Submit File</Button>
-        </div>
+        </Box>
       )}
 
-      {comments.map((comment, index) => (
-        <Draggable key={index}>
-        <div
-          // key={index}
-          style={{
-            position: 'absolute',
-            top: comment.Comment.position.top,
-            left: comment.Comment.position.left,
-            background: 'lightgray',
-            padding: '10px',
-            borderRadius: '5px',
-            boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
-          }}
-        >
-          <button
-            onClick={() => handleDeleteComment(index)}
-            style={{
+      <Box sx={{ mt: 2 }}>
+        {comments.map((comment, index) => (
+          <Draggable key={index}>
+          <Box
+            // key={index}
+            sx={{
               position: 'absolute',
-              top: '5px',
-              right: '5px',
-              background: 'transparent',
-              border: 'none',
-              cursor: 'pointer',
-              fontWeight: 'bold',
-              color: 'red',
+              top: comment.Comment.position.top,
+              left: comment.Comment.position.left,
+              background: 'lightgray',
+              padding: 2,
+              borderRadius: 1,
+              boxShadow: 1,
+              display: 'flex',
+              flexDirection: 'column',
+              gap: 1,
+              minWidth: '100px',
+              maxWidth: '300px'
             }}
           >
-            X
-          </button>
-          <p>{comment.Comment.content}</p>
-          {comment.Comment.fileUrl && (
-            <a href={comment.Comment.fileUrl} target="_blank" rel='noopener noreferrer'>
-              View File
-            </a>
-          )}
-        </div>
-        </Draggable>
-      ))}
-
-      <Box>
-        <h2>AI Summary</h2>
-        <p>{summaryAI}</p>
+            <Button
+              onClick={() => handleDeleteComment(index)}
+              sx={{
+                position: 'absolute',
+                top: 5,
+                right: 5,
+                minWidth: 'auto',
+                padding: 0,
+                backgroundColor: 'transparent',
+                border: 'none',
+                cursor: 'pointer',
+                fontWeight: 'bold',
+                color: 'red',
+              }}
+            >
+              X
+            </Button>
+            <Typography variant='body2'>{comment.Comment.content}</Typography>
+            {comment.Comment.fileUrl && (
+              <a href={comment.Comment.fileUrl} target="_blank" rel='noopener noreferrer'>
+                View File
+              </a>
+            )}
+          </Box>
+          </Draggable>
+        ))}
       </Box>
 
-      <Button variant="contained" color="primary" onClick={handleSaveTranscript}>Save</Button>
+      <Box sx={{ mt: 4 }}>
+        <Typography variant="h6">AI Summary</Typography>
+        <Typography variant="body1">{summaryAI}</Typography>
+      </Box>
+
+      <Button variant="contained" color="primary" onClick={handleSaveTranscript} sx={{ mt: 4 }}>Save</Button>
 
       {handleSave && (
         <Modal open={handleSave} onClose={() => setHandleSave(false)}>
@@ -426,7 +442,16 @@ export default function TranscriptManagementPage() {
                 <Typography id="modal-modal-title" variant="h6" component="h2">
                   Save Transcript
                 </Typography>
-                <TextField value={textTitle} onChange={(e) => setTextTitle(e.target.value)} label="Enter title" fullWidth multiline rows={4} variant="outlined">
+                <TextField 
+                  value={textTitle} 
+                  onChange={(e) => setTextTitle(e.target.value)} 
+                  label="Enter title" 
+                  fullWidth 
+                  multiline 
+                  rows={4} 
+                  variant="outlined"
+                  sx={{ mb: 2 }}
+                >
                 </TextField>
                 <Button variant="contained" color="primary" onClick={confirmSaveTranscript}>Save</Button>
             </Box>

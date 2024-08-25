@@ -75,7 +75,7 @@ export default function LandingPage(){
                                     fontSize: '1.1rem',
                                     }}
                                 >
-                                    Get Started Free
+                                    Get Started for Free
                                 </Button>
                             </AnimatedBox>
                         </Grid>
@@ -140,7 +140,7 @@ export default function LandingPage(){
                             See It in Action
                             </Typography>
                             <Typography variant="body1" sx={{ mb: 4 }}>
-                                Watch how our intuitive interface revolutionizes transcript management. From quick annotations to in-depth analysis, weve got you covered.
+                                Watch how our intuitive interface revolutionizes transcript management. From quick annotations to in-depth analysis, we have got you covered.
                             </Typography>
                         </Grid>
                         

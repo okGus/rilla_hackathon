@@ -23,6 +23,9 @@ This section should list any major frameworks/libraries used to bootstrap the pr
 This is an example of how you may give instructions on setting up your project locally.
 To get a local copy up and running follow these simple example steps.
 
+## Architecture
+![architecture-hackathon](https://rilla-hackathon-files.s3.amazonaws.com/architecture.png)
+
 ### Installation
 
 _Below is an example of how you can get started on installing and setting up the app._

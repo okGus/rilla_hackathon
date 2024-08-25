@@ -7,6 +7,7 @@ import { UserButton } from '@clerk/nextjs';
 const HomePage: React.FC = () => {
   const router = useRouter();
 
+
   return (
     <Box>
       <Box
@@ -32,6 +33,9 @@ const HomePage: React.FC = () => {
         </Typography>
         <Button onClick={() => router.push('/create-transcript')} variant="contained" color="primary" style={{ marginTop: '20px' }}>
           Create Transcript
+        </Button>
+        <Button onClick={() => router.push('/transcripts')} variant="contained" color="primary" style={{ marginTop: '20px' }}>
+          See Transcripts
         </Button>
       </div>
     </Box>

@@ -1,7 +1,10 @@
 "use client";
-import { Box, Button, TextField } from "@mui/material";
+import { Box, Button, TextField, Modal, Typography } from "@mui/material";
 import { useState, useRef, useEffect } from 'react';
 import { computePosition, autoPlacement } from '@floating-ui/react';
+import { useUser } from '@clerk/nextjs';
+import Draggable from 'react-draggable';
+import { useRouter } from "next/navigation";
 
 export default function TranscriptManagementPage() {
   const [text, setText] = useState("");
@@ -20,6 +23,13 @@ export default function TranscriptManagementPage() {
   const [commentText, setCommentText] = useState("");
   const [comments, setComments] = useState<any[]>([]);
   const [attachedFiles, setAttachedFiles] = useState<File | null>(null);
+
+  const [handleSave, setHandleSave] = useState(false);
+  const [textTitle, setTextTitle] = useState("");
+
+  const { user } = useUser()
+
+  const router = useRouter();
 
   type Comment = {
     transcriptId: string;
@@ -115,7 +125,7 @@ export default function TranscriptManagementPage() {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ transcript: text }),
+      body: JSON.stringify({ transcript: text, userId: user?.id }),
     });
     if (response.ok) {
       setText("");
@@ -144,7 +154,7 @@ export default function TranscriptManagementPage() {
         "Content-Type": "application/json",
       },
       
-      body: JSON.stringify({ comment: newComment }),
+      body: JSON.stringify({ comment: newComment, userId: user?.id }),
     });
   
     if (response.ok) {
@@ -156,6 +166,23 @@ export default function TranscriptManagementPage() {
       console.log("Failed to submit comment");
     }
   };
+
+  const handleDeleteComment = async (index: number) => {
+    const comment = comments[index];
+    const response = await fetch("/create-transcript/api/transcripts/delete-comment", {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ commentPK: comment.PK, commentSK: comment.SK, userId: user?.id }),
+    });
+    if (response.ok) {
+      setComments((prevComments) => prevComments.filter((_, i) => i !== index));
+      setCommentCount(prevCount => prevCount + 1);
+    } else {
+      console.error("Failed to delete comment");
+    }
+  }
 
   const handleEnter = (event: React.KeyboardEvent<HTMLDivElement>) => {
     if (event.key === 'Enter') {
@@ -219,6 +246,41 @@ export default function TranscriptManagementPage() {
         console.error('Error handling file upload:', error);
       }
     }
+  }
+
+  const handleSaveTranscript = async () => {
+    setHandleSave(true)
+  }
+
+  const confirmSaveTranscript = async () => {
+    setHandleSave(false);
+    try {
+      const response = await fetch('/create-transcript/api/transcripts/save-title-transcript', { // Adjust path if necessary
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          transcriptId: transcriptID,
+          userId: user?.id,
+          newTitle: textTitle,
+        }),
+      });
+  
+      if (response.ok) {
+        const data = await response.json();
+        console.log('Transcript updated:', data);
+        // Handle success (e.g., show a notification, update UI)
+      } else {
+        console.error('Failed to update transcript');
+      }
+    } catch (error) {
+      console.error('Error:', error);
+    } finally {
+      setHandleSave(false);
+    }
+
+    router.push('/'); // Redirect to the homepage
   }
 
   return (
@@ -301,8 +363,9 @@ export default function TranscriptManagementPage() {
       )}
 
       {comments.map((comment, index) => (
+        <Draggable key={index}>
         <div
-          key={index}
+          // key={index}
           style={{
             position: 'absolute',
             top: comment.Comment.position.top,
@@ -313,6 +376,21 @@ export default function TranscriptManagementPage() {
             boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
           }}
         >
+          <button
+            onClick={() => handleDeleteComment(index)}
+            style={{
+              position: 'absolute',
+              top: '5px',
+              right: '5px',
+              background: 'transparent',
+              border: 'none',
+              cursor: 'pointer',
+              fontWeight: 'bold',
+              color: 'red',
+            }}
+          >
+            X
+          </button>
           <p>{comment.Comment.content}</p>
           {comment.Comment.fileUrl && (
             <a href={comment.Comment.fileUrl} target="_blank" rel='noopener noreferrer'>
@@ -320,12 +398,40 @@ export default function TranscriptManagementPage() {
             </a>
           )}
         </div>
+        </Draggable>
       ))}
 
       <Box>
         <h2>AI Summary</h2>
         <p>{summaryAI}</p>
       </Box>
+
+      <Button variant="contained" color="primary" onClick={handleSaveTranscript}>Save</Button>
+
+      {handleSave && (
+        <Modal open={handleSave} onClose={() => setHandleSave(false)}>
+          <Box
+            sx={{
+              position: 'absolute',
+              top: '50%',
+              left: '50%',
+              transform: 'translate(-50%, -50%)',
+              width: 400,
+              bgcolor: 'background.paper',
+              border: '2px solid #000',
+              boxShadow: 24,
+              p: 4,
+            }}
+          >
+                <Typography id="modal-modal-title" variant="h6" component="h2">
+                  Save Transcript
+                </Typography>
+                <TextField value={textTitle} onChange={(e) => setTextTitle(e.target.value)} label="Enter title" fullWidth multiline rows={4} variant="outlined">
+                </TextField>
+                <Button variant="contained" color="primary" onClick={confirmSaveTranscript}>Save</Button>
+            </Box>
+        </Modal>
+      )}
     </Box>
   );
 }

@@ -32,6 +32,7 @@ export default function TranscriptPage({ params }: { params: { pk: string } }) {
   const [resetComments, setResetComments] = useState(false);
   const [containerDimensions, setContainerDimensions] = useState({ width: 0, height: 0 });
   const containerRef = useRef<HTMLDivElement>(null);
+  const bigContainerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const fetchTranscriptAndComments = async () => {
@@ -132,7 +133,7 @@ export default function TranscriptPage({ params }: { params: { pk: string } }) {
   }
 
   return (
-    <Box sx={{ padding: 4, position: 'relative' }}>
+    <Box sx={{ padding: 4, position: 'relative' }} ref={bigContainerRef}>
       {transcript ? (
         <>
           <Typography variant="h4" gutterBottom sx={{ marginBottom: 2 }}>

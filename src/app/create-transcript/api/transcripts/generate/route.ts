@@ -23,7 +23,7 @@ export async function POST(req: Request) {
             return new NextResponse(JSON.stringify({ error: 'Invalid input data' }), { status: 400 });
         }
 
-        const transcriptText = data.transcriptText;
+        const transcriptText = data.transcript;
         systemPrompt += transcriptText + "\n\n";
 
         // Create prompt from comments

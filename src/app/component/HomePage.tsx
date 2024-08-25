@@ -3,6 +3,7 @@ import { Box, Button, Typography } from '@mui/material';
 import { useRouter } from "next/navigation";
 import { UserButton } from '@clerk/nextjs';
 import { styled } from '@mui/system';
+import Script from 'next/script';
 
 
 const HomePage: React.FC = () => {
@@ -71,10 +72,9 @@ const HomePage: React.FC = () => {
         >
           Rilla
         </Typography>
-        <UserButton
-          showName
-          sx={{ display: 'flex', alignItems: 'center', fontSize: { xs: '0.875rem', md: '1rem' } }}
-        />
+        <div style={{ display: 'flex', alignItems: 'center', fontSize: '1rem' }}>
+          <UserButton showName />
+        </div>
       </Box>
 
       <Box

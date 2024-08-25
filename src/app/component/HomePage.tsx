@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { UserButton } from '@clerk/nextjs';
 import { styled } from '@mui/system';
 import Script from 'next/script';
+import { dark } from '@clerk/themes';
 
 
 const HomePage: React.FC = () => {
@@ -73,7 +74,15 @@ const HomePage: React.FC = () => {
           Rilla
         </Typography>
         <div style={{ display: 'flex', alignItems: 'center', fontSize: '1rem' }}>
-          <UserButton showName />
+          <UserButton 
+            showName 
+            appearance={{
+              baseTheme: dark,
+              variables: {
+                colorText: 'white',
+              },
+            }}
+          />
         </div>
       </Box>
 

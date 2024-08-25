@@ -67,7 +67,12 @@ export default function UserTranscripts() {
   };
 
   return (
-    <Box sx={{ padding: 4 }}>
+    <Box sx={{
+      background: 'linear-gradient(45deg, #1a237e 30%, #283593 90%)',
+      color: 'white',
+      minHeight: "100vh",
+      padding: 4,
+    }}>
       <Typography variant="h4" gutterBottom>
         My Transcripts
       </Typography>

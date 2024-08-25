@@ -6,6 +6,7 @@ import { v4 as uuidv4 } from 'uuid';
 interface TranscriptRequest {
     transcriptId: string;
     transcript: string;
+    userId: string;
 }
 
 export async function POST(request: Request) {
@@ -20,7 +21,7 @@ export async function POST(request: Request) {
 
     const dynamoDbDocClient = DynamoDBDocumentClient.from(dynamoDbClient);
 
-    const { transcript }: TranscriptRequest = await request.json();
+    const { transcript, userId }: TranscriptRequest = await request.json();
     const transcriptId = uuidv4();
     try {
         await dynamoDbDocClient.send(new PutCommand({
@@ -29,6 +30,7 @@ export async function POST(request: Request) {
                 PK: `TRANSCRIPT#${transcriptId}`,
                 SK: 'METADATA',
                 Content: transcript,
+                UserId: userId,
                 CreatedAt: new Date().toISOString(),
             }
         }));

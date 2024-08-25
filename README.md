@@ -75,3 +75,5 @@ CLERK_SECRET_KEY=
 
 [aws.amazon.com/s3]: https://img.shields.io/badge/AWS_S3-569A31?logo=amazons3&logoColor=fff&style=for-the-badge
 [S3-url]:https://console.aws.amazon.com/s3/
+
+[hackathon-screenshot]: https://rilla-hackathon-files.s3.amazonaws.com/homepage.png

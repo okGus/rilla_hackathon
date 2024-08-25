@@ -13,7 +13,8 @@ This section should list any major frameworks/libraries used to bootstrap the pr
 * [![Next][Next.js]][Next-url]
 * [![Mui][Mui.com]][Mui-url]
 * [![Clerk][Clerk.com]][Clerk-url]
-* [![Aws][Aws.com]][Aws-url]
+* [![DynamoDB][aws.amazon.com/dynamodb]][DynamoDB-url]
+* [![S3][aws.amazon.com/s3]][S3-url]
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -66,5 +67,8 @@ CLERK_SECRET_KEY=
 [Clerk.com]: https://img.shields.io/badge/Clerk-000000?style=for-the-badge&logo=clerk&logoColor=white
 [Clerk-url]: https://clerk.com/
 
-[Aws.com]: https://img.shields.io/static/v1?style=for-the-badge&message=Amazon+DynamoDB&color=4053D6&logo=Amazon+DynamoDB&logoColor=FFFFFF&label=
-[Aws-url]: https://console.aws.amazon.com/dynamodb/
+[aws.amazon.com/dynamodb]: https://img.shields.io/static/v1?style=for-the-badge&message=Amazon+DynamoDB&color=4053D6&logo=Amazon+DynamoDB&logoColor=FFFFFF&label=
+[DynamoDB-url]: https://console.aws.amazon.com/dynamodb/
+
+[aws.amazon.com/s3]: https://img.shields.io/badge/AWS_S3-569A31?logo=amazons3&logoColor=fff&style=for-the-badge
+[S3-url]:https://console.aws.amazon.com/s3/

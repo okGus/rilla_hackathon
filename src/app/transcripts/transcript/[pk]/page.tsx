@@ -17,6 +17,7 @@ interface Transcript {
 interface Comment {
   content: string;
   position: { top: number; left: number };
+  fileUrl?: string | null; // Optional file might be attached;
 }
 
 export default function TranscriptPage({ params }: { params: { pk: string } }) {
@@ -60,6 +61,7 @@ export default function TranscriptPage({ params }: { params: { pk: string } }) {
                   top: parseFloat(item.Comment.M.position.M.top.N),
                   left: parseFloat(item.Comment.M.position.M.left.N),
                 },
+                fileUrl: item.Comment.M.fileUrl ? item.Comment.M.fileUrl.S : null, // Check if fileUrl exists
               });
             }
           });
@@ -160,6 +162,13 @@ export default function TranscriptPage({ params }: { params: { pk: string } }) {
                   }}
                 >
                   <Typography variant="body2">{comment.content}</Typography>
+                  {comment.fileUrl && (
+                    <Typography variant='body2' color='primamry' sx={{ marginTop: 1}}>
+                      <a href={comment.fileUrl} target='_blank' rel='noopener noreferrer'>
+                        View Attached File
+                      </a>
+                    </Typography>
+                  )}
                 </Box>
               </Draggable>
             ))}

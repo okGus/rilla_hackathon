@@ -14,6 +14,7 @@ export default function TranscriptManagementPage() {
   const referenceRef = useRef<HTMLDivElement>(null);
   const floatingRef = useRef<HTMLDivElement>(null);
   const inputTextField = useRef<HTMLTextAreaElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null); // File input ref
   const [commentCount, setCommentCount] = useState(0);
   const [transcriptID, setTranscriptID] = useState(""); // Replace with actual transcript ID
 
@@ -21,6 +22,7 @@ export default function TranscriptManagementPage() {
 
   const [commentText, setCommentText] = useState("");
   const [comments, setComments] = useState<any[]>([]);
+  const [attachedFiles, setAttachedFiles] = useState<File | null>(null);
 
   const [handleSave, setHandleSave] = useState(false);
   const [textTitle, setTextTitle] = useState("");
@@ -33,6 +35,7 @@ export default function TranscriptManagementPage() {
     transcriptId: string;
     content: string;
     position: { top: number; left: number };
+    file?: File | null; // Optional file might be attached
   };
 
   const handleTextSelection = () => {
@@ -54,6 +57,7 @@ export default function TranscriptManagementPage() {
         if (response.ok) {
           const data = await response.json();
           setComments(data.comments);
+          setAttachedFiles(null); // Reset after fetching
         } else {
           console.error("Failed to fetch comments");
         }
@@ -194,6 +198,54 @@ export default function TranscriptManagementPage() {
   };
 
   const handleSubmitCommentFile = async () => {
+    const file = fileInputRef.current?.files?.[0];
+    // If file is attached
+    if (file) {
+      try {
+        const formData = new FormData();
+        formData.append('file', file);
+
+        // Upload to S3
+        const uploadResponse = await fetch('/create-transcript/api/upload-to-s3', {
+          method: 'POST',
+          body: formData,
+        });
+
+        if (!uploadResponse.ok) {
+          console.log('Failed to uploaod file to S3');
+          return;
+        }
+
+        const uploadData = await uploadResponse.json();
+        const s3Url = uploadData.fileURL; // API will return S3 URL
+
+        const newComment = {
+          transcriptId: transcriptID,
+          content: commentText || 'File Attached',
+          position: { top: position.top, left: position.left },
+          fileUrl: s3Url,
+        };
+
+        const response = await fetch('/create-transcript/api/transcripts/save-comments', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ comment: newComment }),
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          setCommentText("");
+          setVisible(false);
+          setCommentCount(prevCount => prevCount + 1);
+        } else {
+          console.log("Failed to submit comment");
+        }
+      } catch (error) {
+        console.error('Error handling file upload:', error);
+      }
+    }
   }
 
   const handleSaveTranscript = async () => {
@@ -281,12 +333,14 @@ export default function TranscriptManagementPage() {
           ref={floatingRef}
           style={{
             position: 'absolute',
-            top: position.top,
+            top: position.top + 5,
             left: position.left,
             background: 'lightgray',
             padding: '10px',
             borderRadius: '5px',
             boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+            display: 'flex',
+            flexDirection: 'column'
           }}
         >
           <TextField
@@ -298,7 +352,13 @@ export default function TranscriptManagementPage() {
             value={commentText}
             onChange={(e) => setCommentText(e.target.value)}
           />
-          <Button variant="contained" color="primary" onClick={handleSubmitCommentFile}>Submit Image</Button>
+          <Button variant="contained" color="primary" onClick={handleSubmitComment}>Submit Comment</Button>
+          <input 
+            type='file'
+            ref={fileInputRef}
+            style={{ margin: '10px 0' }}
+          />
+          <Button variant="contained" color="primary" onClick={handleSubmitCommentFile}>Submit File</Button>
         </div>
       )}
 
@@ -332,6 +392,11 @@ export default function TranscriptManagementPage() {
             X
           </button>
           <p>{comment.Comment.content}</p>
+          {comment.Comment.fileUrl && (
+            <a href={comment.Comment.fileUrl} target="_blank" rel='noopener noreferrer'>
+              View File
+            </a>
+          )}
         </div>
         </Draggable>
       ))}

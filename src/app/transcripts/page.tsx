@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import { useUser } from '@clerk/nextjs';
 import { Box, Typography, Card, CardContent, CircularProgress } from '@mui/material';
+import { useRouter } from 'next/navigation'; // Adjust based on your routing solution
 
 // Define the expected structure of the data from DynamoDB
 interface Transcript {
@@ -17,6 +18,7 @@ export default function UserTranscripts() {
   const { user } = useUser();
   const [transcripts, setTranscripts] = useState<Transcript[]>([]);
   const [loading, setLoading] = useState(true);
+  const router = useRouter(); // For navigation
 
   useEffect(() => {
     const fetchTranscripts = async () => {
@@ -28,7 +30,6 @@ export default function UserTranscripts() {
 
           if (response.ok) {
             const data = await response.json();
-            console.log(data.transcript[0].title);
 
             // Extract actual values from DynamoDB format
             const extractedTranscripts = data.transcript.map((item: any) => ({
@@ -40,9 +41,7 @@ export default function UserTranscripts() {
               CreatedAt: item.CreatedAt.S,
             }));
 
-            console.log(extractedTranscripts[0].Title)
 
-            // Filter transcripts to only include those with a title
             setTranscripts(extractedTranscripts);
           } else {
             console.error('Failed to fetch transcripts');
@@ -62,6 +61,11 @@ export default function UserTranscripts() {
     return <CircularProgress />;
   }
 
+  const handleCardClick = (pk: string) => {
+    const cleanedPk = pk.replace('TRANSCRIPT#', '');
+    router.push(`/transcripts/transcript/${cleanedPk}`); // Navigate to the transcript details page
+  };
+
   return (
     <Box sx={{ padding: 4 }}>
       <Typography variant="h4" gutterBottom>
@@ -70,8 +74,12 @@ export default function UserTranscripts() {
       {transcripts.length === 0 ? (
         <Typography>No transcripts available with a title.</Typography>
       ) : (
-        transcripts.map((transcript, index) => (
-          <Card key={index} sx={{ marginBottom: 2 }}>
+        transcripts.map((transcript) => (
+          <Card
+            key={transcript.PK}
+            sx={{ marginBottom: 2, cursor: 'pointer' }}
+            onClick={() => handleCardClick(transcript.PK)}
+          >
             <CardContent>
               <Typography variant="h6">{transcript.Title}</Typography>
               <Typography variant="body2" color="text.secondary">

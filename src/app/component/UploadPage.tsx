@@ -18,7 +18,7 @@ export default function Upload() {
   const [loading, setLoading] = useState(false);
   const [selected, setSelected] = useState('');
 
-  const handleFile = (e) => {
+  const handleFile = (e: any) => {
     try{
       if (e.target.files[0]) {
         const file = e.target.files[0];

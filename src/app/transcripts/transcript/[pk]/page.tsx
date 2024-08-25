@@ -1,9 +1,8 @@
 'use client'
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Box, Typography, CircularProgress, Card, CardContent } from '@mui/material';
-import { useParams } from 'react-router-dom';
-import Divider from '@mui/material/Divider';
+import { Box, Typography, CircularProgress, Divider, Button } from '@mui/material';
+import Draggable from 'react-draggable';
 
 // Define the expected structure of the data from DynamoDB
 interface Transcript {
@@ -20,35 +19,30 @@ interface Comment {
   position: { top: number; left: number };
 }
 
-export default function TranscriptPage({params}: {params: {pk: string} } ) {
+export default function TranscriptPage({ params }: { params: { pk: string } }) {
   const router = useRouter();
-
-  const strip_pk = params.pk
-  const pk = `TRANSCRIPT#${strip_pk}`
-
+  const strip_pk = params.pk;
+  const pk = `TRANSCRIPT#${strip_pk}`;
 
   const [transcript, setTranscript] = useState<Transcript | null>(null);
   const [comments, setComments] = useState<Comment[]>([]);
   const [loading, setLoading] = useState(true);
-
   const [dataLoad, setDataLoad] = useState(false);
-
   const [summaryAI, setSummaryAI] = useState<string | null>(null);
+
+  const [resetComments, setResetComments] = useState(false);
 
   useEffect(() => {
     const fetchTranscriptAndComments = async () => {
       if (pk) {
         try {
-          // Fetch transcript details
-          const transcriptResponse = await fetch(`/transcripts/transcript/${strip_pk}/api/transcript/${strip_pk}`,{
+          const transcriptResponse = await fetch(`/transcripts/transcript/${strip_pk}/api/transcript/${strip_pk}`, {
             method: 'GET',
           });
           const transcriptData = await transcriptResponse.json();
           const tempComments: Comment[] = [];
 
-
           transcriptData.transcript.Items.forEach((item: any) => {
-            // Check if the item is a transcript
             if (item.Content) {
               setTranscript({
                 PK: item.PK.S,
@@ -59,12 +53,11 @@ export default function TranscriptPage({params}: {params: {pk: string} } ) {
                 CreatedAt: item.CreatedAt.S,
               });
             } else {
-              // Otherwise, assume it's a comment
               tempComments.push({
                 content: item.Comment.M.content.S,
                 position: {
-                  top: parseFloat(item.Comment.M.position.M.top.N), // Convert from string to number
-                  left: parseFloat(item.Comment.M.position.M.left.N), // Convert from string to number
+                  top: parseFloat(item.Comment.M.position.M.top.N),
+                  left: parseFloat(item.Comment.M.position.M.left.N),
                 },
               });
             }
@@ -83,10 +76,21 @@ export default function TranscriptPage({params}: {params: {pk: string} } ) {
     fetchTranscriptAndComments();
   }, [pk]);
 
-  useEffect (() => {
+  useEffect(() => {
+    if (resetComments) {
+      // Reset comments to original positions
+      setResetComments(false);
+      setComments((prevComments) => prevComments.map((comment) => ({
+        ...comment,
+        position: { ...comment.position }, // This forces the Draggable component to update its position
+      })));
+    }
+  }, [resetComments]);
+
+  useEffect(() => {
     const fetchSummary = async () => {
       try {
-        const response = await fetch('/transcripts/transcript/${strip_pk}/api/generate', {
+        const response = await fetch(`/transcripts/transcript/${strip_pk}/api/generate`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -104,55 +108,49 @@ export default function TranscriptPage({params}: {params: {pk: string} } ) {
       }
     };
 
-    // Fetch summary if comments have been added
     if (comments.length > 0) {
       fetchSummary();
     }
   }, [dataLoad]);
+
+  const handleResetComments = () => {
+    setResetComments(true);
+  };
 
   if (loading) {
     return <CircularProgress />;
   }
 
   return (
-    <Box sx={{ padding: 4 }}>
+    <Box sx={{ padding: 4, position: 'relative' }}>
       {transcript ? (
         <>
           <Typography variant="h4" gutterBottom sx={{ marginBottom: 2 }}>
             {transcript.Title}
           </Typography>
-          <Typography variant="body1" paragraph sx={{ marginBottom: 4 }}>
-            {transcript.Content}
-          </Typography>
+          <Box sx={{ position: 'relative' }}>
+            <Typography variant="body1" paragraph sx={{ marginBottom: 4 }}>
+              {transcript.Content}
+            </Typography>
+            {comments.map((comment, index) => (
+              <Draggable key={index} position={{ x: comment.position.left, y: comment.position.top - 670 }}>
+                <Box
+                  sx={{
+                    position: 'absolute',
+                    backgroundColor: 'rgba(255, 255, 255, 1)',
+                    padding: 1,
+                    borderRadius: 1,
+                    boxShadow: 2,
+                  }}
+                >
+                  <Typography variant="body2">{comment.content}</Typography>
+                </Box>
+              </Draggable>
+            ))}
+          </Box>
 
           <Divider sx={{ marginY: 4 }} />
 
-          <Typography variant="h6" gutterBottom sx={{ marginBottom: 2 }}>
-            Comments
-          </Typography>
-          {comments.length === 0 ? (
-            <Typography>No comments available.</Typography>
-          ) : (
-            comments.map((comment, index) => (
-              <Card key={index} sx={{ marginBottom: 2, position: 'relative', padding: 2 }}>
-                <CardContent>
-                  <Typography variant="body2">{comment.content}</Typography>
-                  <Box
-                    sx={{
-                      position: 'absolute',
-                      top: comment.position.top,
-                      left: comment.position.left,
-                      width: 12,
-                      height: 12,
-                      backgroundColor: 'primary.main',
-                      borderRadius: '50%',
-                      transform: 'translate(-50%, -50%)',
-                    }}
-                  />
-                </CardContent>
-              </Card>
-            ))
-          )}
           {summaryAI && (
             <Box sx={{ marginTop: 4, padding: 2, borderRadius: 2, boxShadow: 1, backgroundColor: '#f5f5f5' }}>
               <Typography variant="h6" gutterBottom>

@@ -28,8 +28,10 @@
     "react-annotator": "^0.0.1",
     "react-dom": "^18",
     "react-draggable": "^4.4.6",
+    "react-markdown": "^9.0.1",
     "react-quill": "^2.0.0",
     "react-router-dom": "^6.26.1",
+    "remark-gfm": "^4.0.0",
     "uuid": "^10.0.0"
   },
   "devDependencies": {

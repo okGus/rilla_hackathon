@@ -3,6 +3,8 @@ import React, { useEffect, useState, useRef, useLayoutEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Box, Typography, CircularProgress, Divider, Button } from '@mui/material';
 import Draggable from 'react-draggable';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 
 // Define the expected structure of the data from DynamoDB
 interface Transcript {
@@ -182,7 +184,12 @@ export default function TranscriptPage({ params }: { params: { pk: string } }) {
               <Typography variant="h6" gutterBottom>
                 AI Summary
               </Typography>
-              <Typography variant="body1">{summaryAI}</Typography>
+              {/* <Typography variant="body1">{summaryAI}</Typography> */}
+              <ReactMarkdown
+                remarkPlugins={[remarkGfm]}
+              >
+                {summaryAI}
+              </ReactMarkdown>
             </Box>
           )}
         </>

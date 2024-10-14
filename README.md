@@ -1,6 +1,6 @@
 <!-- ABOUT THE PROJECT -->
 ## About the Project
-[![Rilla Voice Hackathon][hackathon-screenshot]](http://18.208.201.52:3000/)
+<!-- [![Rilla Voice Hackathon][hackathon-screenshot]](http://18.208.201.52:3000/) -->
 
 This feature directly supports Rilla's goal of providing actionable, data-driven feedback by enabling detailed annotation and summarization of sales interactions, improving coaching and decision-making.
 
@@ -24,7 +24,8 @@ This is an example of how you may give instructions on setting up your project l
 To get a local copy up and running follow these simple example steps.
 
 ## Architecture
-![architecture-hackathon](https://rilla-hackathon-files.s3.amazonaws.com/architecture.png)
+<!-- ![architecture-hackathon](https://rilla-hackathon-files.s3.amazonaws.com/architecture.png) -->
+![architecture-hackathon](./architecture.png)
 
 ### Installation
 
